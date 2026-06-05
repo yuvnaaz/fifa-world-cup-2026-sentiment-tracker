@@ -1,0 +1,19 @@
+# ── Kafka client ──────────────────────────────────────────────────────────────
+kafka-python-ng==2.2.3
+
+# ── NLP / ML Inference ───────────────────────────────────────────────────────
+# Use latest transformers + torch compatible with Python 3.14
+transformers>=4.44.0
+torch>=2.9.0
+
+# ── Database Driver ───────────────────────────────────────────────────────────
+# psycopg3 (psycopg) has pre-built wheels for Python 3.14; psycopg2-binary does not
+psycopg[binary]>=3.1.0
+
+# ── Dashboard / Visualization ─────────────────────────────────────────────────
+streamlit>=1.35.0
+plotly>=5.22.0
+pandas>=2.2.2
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+python-dotenv>=1.0.1
