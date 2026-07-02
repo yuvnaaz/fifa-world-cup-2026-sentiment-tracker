@@ -17,3 +17,13 @@ pandas>=2.2.2
 
 # ── Utilities ─────────────────────────────────────────────────────────────────
 python-dotenv>=1.0.1
+<<<<<<< HEAD
+=======
+
+# ── Additional social producers ───────────────────────────────────────────────
+praw>=7.7.1                       # producer_reddit.py
+websockets>=12.0                  # producer_bluesky.py (auto-installed if missing)
+deep-translator>=1.11.4           # producer_bluesky.py (auto-installed if missing)
+google-api-python-client>=2.130.0 # producer_youtube.py (free, official API)
+requests>=2.32.0                  # producer_twitter.py (needs paid X API tier — see file header)
+>>>>>>> aad0f38 (Improve consumer robustness and add agent workflow)
