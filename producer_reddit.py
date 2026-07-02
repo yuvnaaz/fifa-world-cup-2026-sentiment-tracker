@@ -67,13 +67,10 @@ SUBREDDITS = [
     "argentina",       # Argentina fans
     "futebol",         # Brazil fans (Portuguese)
     "soccerstreams",   # Match day discussion threads
-<<<<<<< HEAD
-=======
     "football",        # Large general football/soccer community
     "MLS",             # US domestic league fans, cross-posts national team news
     "PremierLeague",   # High volume during shared international windows
     "footballhighlights",  # Highlight-reaction traffic
->>>>>>> aad0f38 (Improve consumer robustness and add agent workflow)
 ]
 
 # ── World Cup Keyword Filter ──────────────────────────────────────────────────

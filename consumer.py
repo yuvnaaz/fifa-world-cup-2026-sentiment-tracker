@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-=======
 from __future__ import annotations
 
->>>>>>> aad0f38 (Improve consumer robustness and add agent workflow)
 """
 consumer.py — FIFA World Cup 2026 ML Inference & Persistence Engine
 
@@ -21,22 +18,12 @@ Usage:
 """
 
 import json
-<<<<<<< HEAD
-=======
 import os
->>>>>>> aad0f38 (Improve consumer robustness and add agent workflow)
 import time
 import logging
 import sys
 from datetime import datetime, timezone
 
-<<<<<<< HEAD
-import psycopg
-from psycopg.rows import dict_row
-from kafka import KafkaConsumer, KafkaProducer
-from kafka.errors import KafkaError
-from transformers import pipeline
-=======
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -60,7 +47,6 @@ try:
     from transformers import pipeline
 except ImportError:  # pragma: no cover - only exercised when deps are missing
     pipeline = None
->>>>>>> aad0f38 (Improve consumer robustness and add agent workflow)
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -71,19 +57,6 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # ── Configuration ─────────────────────────────────────────────────────────────
-<<<<<<< HEAD
-BOOTSTRAP_SERVERS = ["localhost:9092"]
-TOPIC_MAIN        = "world_cup_firehose"
-TOPIC_DLQ         = "world_cup_dlq"
-GROUP_ID          = "wc-sentiment-group"
-
-DB_CONFIG = {
-    "host":     "localhost",
-    "port":     5432,
-    "dbname":   "world_cup_sentiment",
-    "user":     "postgres",
-    "password": "password",
-=======
 BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092").split(",")
 TOPIC_MAIN        = os.getenv("KAFKA_TOPIC_MAIN", "world_cup_firehose")
 TOPIC_DLQ         = os.getenv("KAFKA_TOPIC_DLQ", "world_cup_dlq")
@@ -95,7 +68,6 @@ DB_CONFIG = {
     "dbname":   os.getenv("DB_NAME", "world_cup_sentiment"),
     "user":     os.getenv("DB_USER", "postgres"),
     "password": os.getenv("DB_PASSWORD", "password"),
->>>>>>> aad0f38 (Improve consumer robustness and add agent workflow)
 }
 
 BATCH_SIZE    = 16    # target micro-batch size (posts)
@@ -142,15 +114,9 @@ TEAM_KEYWORDS: dict[str, list[str]] = {
         "kroos", "neuer", "nagelsmann",
     ],
     "England": [
-<<<<<<< HEAD
-        "england", "three lions", "gareth southgate", "southgate",
-        "bellingham", "saka", "kane", "harry kane",
-        "foden", "trippier", "rashford",
-=======
         "england", "three lions", "tuchel", "thomas tuchel",
         "bellingham", "saka", "kane", "harry kane",
         "foden", "konsa", "rashford",
->>>>>>> aad0f38 (Improve consumer robustness and add agent workflow)
     ],
     "Spain": [
         "spain", "españa", "la roja", "la furia roja",
@@ -174,11 +140,6 @@ def extract_target_team(text: str) -> str:
     return "Neutral/General"
 
 
-<<<<<<< HEAD
-# ── Model Initialization ──────────────────────────────────────────────────────
-def load_model():
-    """Load DistilBERT sentiment pipeline. Auto-detects CUDA if available."""
-=======
 def normalize_text(text: str, max_len: int = MAX_TEXT_LEN) -> str:
     """Trim noisy translation suffixes, normalize whitespace, and enforce a safe length."""
     cleaned = str(text or "").strip()
@@ -198,7 +159,6 @@ def load_model():
     if pipeline is None:
         raise RuntimeError("transformers is not installed. Install requirements first.")
 
->>>>>>> aad0f38 (Improve consumer robustness and add agent workflow)
     try:
         import torch
         device = 0 if torch.cuda.is_available() else -1
@@ -222,12 +182,9 @@ def load_model():
 # ── Database ──────────────────────────────────────────────────────────────────
 def get_db_connection():
     """Open a persistent PostgreSQL connection with retry logic."""
-<<<<<<< HEAD
-=======
     if psycopg is None:
         raise RuntimeError("psycopg is not installed. Install requirements first.")
 
->>>>>>> aad0f38 (Improve consumer robustness and add agent workflow)
     connstr = (
         f"host={DB_CONFIG['host']} port={DB_CONFIG['port']} "
         f"dbname={DB_CONFIG['dbname']} user={DB_CONFIG['user']} "
@@ -273,14 +230,10 @@ def persist_batch(conn, records: list[dict]):
 
 
 # ── Kafka Helpers ─────────────────────────────────────────────────────────────
-<<<<<<< HEAD
-def create_consumer() -> KafkaConsumer:
-=======
 def create_consumer():
     if KafkaConsumer is None:
         raise RuntimeError("kafka-python is not installed. Install requirements first.")
 
->>>>>>> aad0f38 (Improve consumer robustness and add agent workflow)
     retries = 0
     while True:
         try:
@@ -303,14 +256,10 @@ def create_consumer():
             time.sleep(wait)
 
 
-<<<<<<< HEAD
-def create_dlq_producer() -> KafkaProducer:
-=======
 def create_dlq_producer():
     if KafkaProducer is None:
         raise RuntimeError("kafka-python is not installed. Install requirements first.")
 
->>>>>>> aad0f38 (Improve consumer robustness and add agent workflow)
     return KafkaProducer(
         bootstrap_servers=BOOTSTRAP_SERVERS,
         value_serializer=lambda v: json.dumps(v).encode("utf-8"),
@@ -318,11 +267,7 @@ def create_dlq_producer():
     )
 
 
-<<<<<<< HEAD
-def send_to_dlq(dlq_producer: KafkaProducer, raw_value, error: str):
-=======
 def send_to_dlq(dlq_producer, raw_value, error: str):
->>>>>>> aad0f38 (Improve consumer robustness and add agent workflow)
     """Route a faulty payload to the Dead Letter Queue topic."""
     try:
         dlq_payload = {
@@ -366,20 +311,10 @@ def run():
 
                     # ── Stage 1: Parse & validate ─────────────────────────────
                     try:
-<<<<<<< HEAD
-                        text = str(raw_value.get("text", "")).strip()
-
-                        if not text:
-                            raise ValueError("Empty text field")
-                        if len(text) > MAX_TEXT_LEN:
-                            # Truncate rather than discard — still valuable signal
-                            text = text[:MAX_TEXT_LEN]
-=======
                         text = normalize_text(raw_value.get("text", ""))
 
                         if not text:
                             raise ValueError("Empty text field")
->>>>>>> aad0f38 (Improve consumer robustness and add agent workflow)
 
                         # Encode/decode round-trip to catch bad character sequences
                         text.encode("utf-8").decode("utf-8")
